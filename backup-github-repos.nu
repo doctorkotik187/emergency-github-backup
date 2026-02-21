@@ -2,16 +2,17 @@
 
 # Configuration
 let username = "doctorkotik187"
-let backup_dir = ($"~/Downloads" | path expand)
+let backup_dir = ($"~/0-doctorkotik/0-core/4-ARCHIVES/web-backups/github" | path expand)
 
 # Create directory if needed
-mkdir create $backup_dir
+mkdir -v $backup_dir
 
 # Timestamp for backup
 let timestamp = (date now | format date "%Y-%m-%d_%H-%M-%S")
 
-# Fetch repos without let binding - direct pipeline
+# Fetch repos, exclude forks
 http get $"https://api.github.com/users/($username)/repos"
+| where fork == false
 | each {
     |repo|
     let dest = $"($backup_dir)/($repo.name)_($timestamp).zip"
@@ -20,9 +21,10 @@ http get $"https://api.github.com/users/($username)/repos"
     # Download zip
     http get $zip_url --raw | save $dest
 
-    # Safe print - concatenate strings instead of complex interpolation
+    # Safe print
     print $"Downloaded ($repo.name)"
     print $"Branch: ($repo.default_branch)"
     print $"Saved to: ($dest)"
     print "─"
 }
+| print $"Backup done."
