@@ -27,4 +27,4 @@ http get $"https://api.github.com/users/($username)/repos"
     print $"Saved to: ($dest)"
     print "─"
 }
-| print $"Backup done."
+| print $"Backup maybe done."
